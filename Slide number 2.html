@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>November 2024 Calendar</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        .calendar-heading {
+            font-size: 2.5rem;
+            font-style: italic;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .calendar-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            max-width: 700px;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-cell {
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            position: relative;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .calendar-cell.xed {
+            opacity: 0.5;
+            color: #999;
+            position: relative;
+        }
+
+        .calendar-cell.xed::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: red;
+            opacity: 0.5;
+            transform: rotate(45deg);
+            z-index: 0;
+        }
+
+        .calendar-cell.crossed {
+            opacity: 0.5;
+        }
+
+        .calendar-cell.crossed::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: red;
+            opacity: 0.5;
+            transform: rotate(45deg);
+            z-index: 0;
+            animation: drawCross 1s forwards;
+        }
+
+        @keyframes drawCross {
+            0% {
+                transform: rotate(45deg) scale(0);
+            }
+            100% {
+                transform: rotate(45deg) scale(1);
+            }
+        }
+
+        .shine {
+            animation: shine 2s ease forwards;
+        }
+
+        @keyframes shine {
+            0% {
+                background-color: #fff;
+                color: #333;
+            }
+            50% {
+                background-color: #f9f000;
+                color: #f00;
+            }
+            100% {
+                background-color: #f9f000;
+                color: #f00;
+                font-weight: bold;
+            }
+        }
+
+        #fireworkCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                background-color: transparent;
+            }
+            100% {
+                background-color: black;
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 3s forwards;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="calendar-heading" id="heading">NOVEMBER 2024</div>
+    <div class="calendar-container" id="calendar"></div>
+    <canvas id="fireworkCanvas"></canvas>
+
+    <script>
+        const calendarContainer = document.getElementById('calendar');
+        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const month = 10;
+        const year = 2024;
+
+        let currentDate = new Date(year, month, 1);
+        let firstDayOfMonth = currentDate.getDay();
+        let totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+
+        const canvas = document.getElementById('fireworkCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let explosionPoint = { x: 0, y: 0 }; // Set dynamically based on "7" block position
+
+        function Particle() {
+            this.x = explosionPoint.x;
+            this.y = explosionPoint.y;
+            this.vx = (Math.random() - 0.5) * 10;
+            this.vy = (Math.random() - 0.5) * 10;
+            this.alpha = Math.random() * 0.5 + 0.5;
+            this.size = Math.random() * 4 + 1;
+            this.color = `rgb(${~~(Math.random() * 255)}, ${~~(Math.random() * 255)}, ${~~(Math.random() * 255)})`;
+        }
+
+        Particle.prototype = {
+            gravity: 0.05,
+            move: function() {
+                this.x += this.vx;
+                this.vy += this.gravity;
+                this.y += this.vy;
+                this.alpha -= 0.01;
+                return this.alpha > 0;
+            },
+            draw: function() {
+                ctx.save();
+                ctx.beginPath();
+                ctx.translate(this.x, this.y);
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha;
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        };
+
+        function createFireworks() {
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function updateFireworks() {
+            particles = particles.filter(p => p.move());
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => p.draw());
+        }
+
+        let fireworkInterval;
+        function startFireworks() {
+            fireworkInterval = setInterval(createFireworks, 100);
+            setTimeout(() => {
+                clearInterval(fireworkInterval);
+                document.body.classList.add('fade-out');
+                calendarContainer.remove();
+                document.getElementById('heading').remove();
+            }, 2000);
+        }
+
+        function generateCalendar() {
+            daysOfWeek.forEach(day => {
+                const header = document.createElement('div');
+                header.classList.add('calendar-cell');
+                header.innerText = day;
+                calendarContainer.appendChild(header);
+            });
+
+            for (let i = 1; i <= totalDaysInMonth; i++) {
+                const dayCell = document.createElement('div');
+                dayCell.classList.add('calendar-cell');
+                dayCell.innerText = i;
+
+                if (i <= 5) {
+                    dayCell.classList.add('xed');
+                }
+
+                if (i === 6) {
+                    setTimeout(() => {
+                        dayCell.classList.add('crossed');
+                    }, 1000);
+                }
+
+                if (i === 7) {
+                    setTimeout(() => {
+                        dayCell.classList.add('shine');
+                        setExplosionPoint(dayCell); // Set the fireworks position
+                        startFireworks();
+                    }, 2000);
+                }
+
+                calendarContainer.appendChild(dayCell);
+            }
+        }
+
+        function setExplosionPoint(dayCell) {
+            const rect = dayCell.getBoundingClientRect();
+            explosionPoint = {
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2
+            };
+        }
+
+        function animate() {
+            updateFireworks();
+            requestAnimationFrame(animate);
+            setTimeout(() => {
+                    window.location.href = 'Slide number 3.html'; // Replace with your target page
+                }, 2500); // Wait for the swipe-up animation to finish before redirecting
+        }
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        generateCalendar();
+        animate();
+// Modify startFireworks to add a 1-second delay
+function startFireworks() {
+    setTimeout(() => {
+        fireworkInterval = setInterval(createFireworks, 100);
+        setTimeout(() => {
+            clearInterval(fireworkInterval);
+            document.body.classList.add('fade-out');
+            calendarContainer.remove();
+            document.getElementById('heading').remove();
+        }, 2000);
+    }, 1500); // 1.5-second delay before fireworks
+}
+
+    </script>
+</body>
+</html>

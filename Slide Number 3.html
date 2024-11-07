@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Cake</title>
+    <style>
+        body {
+            background-color: #333;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 3rem;
+            color: red;
+            margin-bottom: 200px; /* Added space between title and cake */
+        }
+
+        .cake {
+            position: relative;
+            width: 250px;
+            height: 200px;
+            margin-bottom: 30px;
+        }
+
+        .plate {
+            width: 270px;
+            height: 110px;
+            position: absolute;
+            bottom: -10px;
+            left: -10px;
+            background-color: #ccc;
+            border-radius: 50%;
+            box-shadow: 0 2px 0 darken(#ccc, 10%), 0 5px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .layer {
+            position: absolute;
+            display: block;
+            width: 250px;
+            height: 100px;
+            border-radius: 50%;
+        }
+
+        .layer-bottom { top: 100px; background-color: #553c13; }
+        .layer-middle { top: 50px; background-color: #f0e4d0; }
+        .layer-top { top: 0; background-color: #553c13; }
+
+        .icing {
+            top: 10px;
+            left: 5px;
+            background-color: #f0e4d0;
+            width: 240px;
+            height: 80px;
+            border-radius: 50%;
+        }
+
+        .candle {
+            position: absolute;
+            background-color: #7B020B;
+            width: 16px;
+            height: 50px;
+            border-radius: 8px 8px 4px 4px;
+            top: -20px;
+            left: 50%;
+            margin-left: -8px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .candle:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 16px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #9B3333;
+        }
+
+        .flame {
+            position: absolute;
+            background-color: orange;
+            width: 15px;
+            height: 35px;
+            border-radius: 10px 10px 10px 10px / 25px 25px 10px 10px;
+            top: -34px;
+            left: 50%;
+            margin-left: -7.5px;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(orange, 0.5), 0 0 20px rgba(orange, 0.5);
+            transform-origin: 50% 90%;
+            animation: flicker 1s ease-in-out alternate infinite;
+        }
+
+        @keyframes flicker {
+            0% { transform: skewX(5deg); opacity: 1; }
+            100% { transform: skewX(-5deg); opacity: 0.8; }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: gold;
+            position: absolute;
+            bottom: 30px; /* Position the subtitle just above the bottom */
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .transition-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .transition-container.show {
+            opacity: 1;
+        }
+
+        .final-message {
+            font-size: 2rem;
+            color: red;
+        }
+
+        .final-subtitle {
+            font-size: 1.2rem;
+            color: yellow;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="title">HAPPY BIRTHDAY</div>
+
+    <div class="cake">
+        <div class="plate"></div>
+        <div class="layer layer-bottom"></div>
+        <div class="layer layer-middle"></div>
+        <div class="layer layer-top"></div>
+        <div class="icing"></div>
+
+        <div class="candle">
+            <div class="flame"></div>
+        </div>
+    </div>
+
+    <div class="subtitle">Touch the candle to blow it out!!!</div>
+
+    <div class="transition-container hidden">
+        <div class="final-message">HAPPY BIRTHDAY</div>
+        <div class="final-subtitle">Count not the candles…see the lights they give. Count not the years, but the life you live. Wishing you a wonderful time ahead.</div>
+    </div>
+
+    <script>
+        document.querySelector('.candle').addEventListener('click', function() {
+            // Blow out the candle (remove the flame)
+            const flame = document.querySelector('.flame');
+            flame.style.display = 'none';
+
+            // Transition to the new message
+            const transitionContainer = document.querySelector('.transition-container');
+            transitionContainer.classList.add('show');
+            document.body.style.backgroundColor = 'black'; // Change background to black
+
+            // Hide initial elements...
+            document.querySelector('.title').style.display = 'none';
+            document.querySelector('.subtitle').style.display = 'none';
+            document.querySelector('.cake').style.display = 'none';
+        });
+    </script>
+
+</body>
+</html>

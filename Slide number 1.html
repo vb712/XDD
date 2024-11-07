@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Birthday E-Card</title>
+    <style>
+        body, html {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Canvas styling */
+        #clockCanvas {
+            width: 250px; /* Enlarged width */
+            height: 250px; /* Enlarged height */
+            background-color: #222;
+            border: 8px solid #fff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+        }
+
+        /* Digital Clock Styling */
+        #digitalClock {
+            font-size: 28px; /* Enlarged font size */
+            font-weight: bold;
+            color: #fff;
+            background-color: #333;
+            padding: 12px 24px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+
+        /* Fade-in and Swipe-up transition */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        @keyframes swipeUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="clockCanvas" width="250" height="250"></canvas> <!-- Enlarged canvas size -->
+    <div id="digitalClock">11:59:55 PM</div>
+    <div class="calendar-heading" id="heading">NOVEMBER 2024</div>
+    <div class="calendar-container" id="calendar"></div>
+    <canvas id="fireworkCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('clockCanvas');
+        const ctx = canvas.getContext('2d');
+        const radius = canvas.height / 2;
+        ctx.translate(radius, radius);
+
+        let hour = 11, minute = 59, second = 55;
+        let amPm = 'PM';
+
+        function drawClock() {
+            drawFace(ctx, radius);
+            drawNumbers(ctx, radius);
+            drawTime(ctx, radius);
+        }
+
+        function drawFace(ctx, radius) {
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * 0.9, 0, 2 * Math.PI);
+            ctx.fillStyle = '#222';
+            ctx.fill();
+        }
+
+        function drawNumbers(ctx, radius) {
+            ctx.font = radius * 0.15 + "px Arial";
+            ctx.textBaseline = "middle";
+            ctx.textAlign = "center";
+            for (let num = 1; num <= 12; num++) {
+                let ang = num * Math.PI / 6;
+                ctx.rotate(ang);
+                ctx.translate(0, -radius * 0.85);
+                ctx.rotate(-ang);
+                ctx.fillStyle = '#fff';
+                ctx.fillText(num.toString(), 0, 0);
+                ctx.rotate(ang);
+                ctx.translate(0, radius * 0.85);
+                ctx.rotate(-ang);
+            }
+        }
+
+        function drawTime(ctx, radius) {
+            let hourAngle = ((hour % 12) + minute / 60) * Math.PI / 6;
+            let minuteAngle = (minute + second / 60) * Math.PI / 30;
+            let secondAngle = (second * Math.PI) / 30;
+
+            drawHand(ctx, hourAngle, radius * 0.5, radius * 0.07);
+            drawHand(ctx, minuteAngle, radius * 0.8, radius * 0.07);
+            drawHand(ctx, secondAngle, radius * 0.9, radius * 0.02);
+        }
+
+        function drawHand(ctx, pos, length, width) {
+            ctx.beginPath();
+            ctx.lineWidth = width;
+            ctx.lineCap = "round";
+            ctx.moveTo(0, 0);
+            ctx.rotate(pos);
+            ctx.lineTo(0, -length);
+            ctx.stroke();
+            ctx.rotate(-pos);
+        }
+        function animateClock() {
+    const digitalClock = document.getElementById('digitalClock');
+    const interval = setInterval(() => {
+        second++;
+        if (second === 60) {
+            second = 0;
+            minute++;
+        }
+        if (minute === 60) {
+            minute = 0;
+            hour++;
+        }
+        if (hour === 12 && minute === 0 && second === 0) {
+            amPm = amPm === 'PM' ? 'AM' : 'PM';
+            if (amPm === 'AM') {
+                clearInterval(interval);
+                // Animation ends, so start the calendar and fireworks
+                canvas.style.animation = "swipeUp 2s forwards";
+                digitalClock.style.animation = "swipeUp 2s forwards";
+                
+                // After the animation ends, redirect to another page (e.g., "nextpage.html")
+                setTimeout(() => {
+                    window.location.href = 'Slide number 2.html'; // Replace with your target page
+                }, 2500); // Wait for the swipe-up animation to finish before redirecting
+            }
+        }
+        if (hour > 12) hour = 1;
+        digitalClock.innerHTML = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')} ${amPm}`;
+        ctx.clearRect(-radius, -radius, canvas.width, canvas.height);
+        drawClock();
+    }, 1000);
+}
+
+
+        drawClock();
+        animateClock();
+        
+
+
+
+    </script>
+</body>
+</html>
+
+
